@@ -1,0 +1,34 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pgsql-horizon-pv
+  labels:
+    app: horizon
+    tier: db
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /nfs/pgsql-horizon/data
+    server: 10.110.11.26
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pgsql-horizon-pvc
+  labels:
+    app: horizon
+    tier: db
+spec:
+  selector:
+    matchLabels:
+      app: horizon
+      tier: db
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi

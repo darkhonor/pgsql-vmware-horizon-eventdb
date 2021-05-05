@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgsql-horizon-svc
+spec:
+  selector:
+    app: horizon
+    tier: db
+  type: LoadBalancer
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgsql-horizon
+  labels: 
+    app: horizon
+    tier: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: horizon
+      tier: db
+  template:
+    metadata:
+      labels:
+        app: horizon
+        tier: db
+    spec:
+      containers:
+        - name: horizondb
+          image: postgres:latest
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgsql-horizon-secret
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: pgsql-horizon-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: pgdatavol
+      volumes:
+        - name: pgdatavol
+          persistentVolumeClaim:
+            claimName: pgsql-horizon-pvc
+

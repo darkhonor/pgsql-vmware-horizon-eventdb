@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgsql-horizon-config
+  labels:
+    app: horizon
+    tier: db
+data:
+  POSTGRES_DB: horizondb
+  POSTGRES_USER: horizonuser
+  PGDATA: /var/lib/postgresql/data/horizon
+  POSTGRES_HOST_AUTH_METHOD: trust
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgsql-horizon-secret
+type: Opaque
+data:
+  password: LkQuLFpwer1HPmZjMlVObUMlPU9gWzZnVDYlOj9lCg== # Base64-encoded string
+
